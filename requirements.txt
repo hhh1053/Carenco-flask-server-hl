@@ -1,0 +1,5 @@
+numpy==1.19.5
+opencv-contrib-python==4.1.0.25
+opencv-python==4.1.0.25
+requests_toolbelt
+flask
