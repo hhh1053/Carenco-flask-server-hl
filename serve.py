@@ -2,9 +2,19 @@
 import json
 import cv2
 import numpy as np
+import uuid
+import boto3
+import pymysql
 from flask import Flask, Response, request, send_file, jsonify, render_template
-
 from requests_toolbelt import MultipartEncoder
+import random
+
+REGION='ap-northeast-2'
+ACCESS_KEY_ID='AKIAQTAIP2INMKL7LST6'
+ACCESS_SECRET_KEY='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'
+BUCKET_NAME='carenco-image-server2'
+LOCATION ='ap-northeast-2'
+
 
 class Foot:
   def __init__(self):
@@ -77,18 +87,81 @@ class Foot:
     image_data = cv2.imwrite(final_output_path, dst)
     return dst
 
-# Initialize the flask application
+
+class S3:
+  def ImageUploadToS3(self):
+    s3_obj=self.s3_connection()
+
+    new_name=str(uuid.uuid4())+'.jpg'
+    print(new_name)
+
+    self.s3_put_object(s3_obj,new_name)
+
+    image_url=self.s3_get_image_url(new_name)
+    return image_url
+
+  def s3_connection(self):
+      try:
+          s3_obj = boto3.client(
+              service_name='s3',
+              region_name=REGION,
+              aws_access_key_id=ACCESS_KEY_ID,
+              aws_secret_access_key=ACCESS_SECRET_KEY
+             
+          )
+      except Exception as e:
+          print(e)
+      else:
+          print("s3 bucket connected!")
+          return s3_obj
+       
+  def s3_put_object(self,s3_obj,new_name):
+      s3_obj.upload_file('./foot_image.jpg',BUCKET_NAME,new_name,ExtraArgs={'ContentType':'image/jpg'})
+      return True
+
+  def s3_get_image_url(self,filename):
+    image_url = f'https://{BUCKET_NAME}.s3.{LOCATION}.amazonaws.com/{filename}'
+    return image_url
+
+class Sql():
+
+  def save(self,id,img_url,weight):
+    conn = pymysql.connect(host='database-1.c5pmtrhecz2d.ap-northeast-1.rds.amazonaws.com', user='admin', db='carenco', password='zpdjdpszh', charset='utf8') 
+    cursor = conn.cursor() 
+    sql = "UPDATE carenco.foot_print SET image = %s,weight = %s WHERE id = %s" 
+    cursor.execute(sql,(img_url,weight,id)) 
+    conn.commit()
+
+    # sql = "SELECT * FROM carenco.foot_print WHERE id=%s"
+    # cursor.execute(sql,(id))
+    # result=cursor.fetchall()
+    # print(result)
+
+    conn.close()  
+
+  
+
 app = Flask(__name__)
 
 @app.route('/image', methods=['GET', 'POST'])
 def classification():
   params = request.get_json(force=True)
+  id = params['id']
+
   foot = Foot()
   foot.generate_image(params, './')
 
-  m = MultipartEncoder(fields={'files' : ('./foot_image.jpg', open('./foot_image.jpg', 'rb'),
-                              'image.jpg')})
-  
-  return Response(m.to_string(), mimetype=m.content_type)
+  s3 = S3()
+  image_url=s3.ImageUploadToS3()
+
+  sql = Sql()
+  weight = random.randrange(40, 100)
+  sql.save(id,image_url,weight)
+
+ 
+
+  return image_url
+
+
 if __name__ == "__main__":
   app.run(host='localhost', port=5000)
