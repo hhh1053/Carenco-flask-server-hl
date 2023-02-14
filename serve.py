@@ -77,17 +77,16 @@ class Foot:
       col_idx += 1
     return data
 
-  def generate_weight(self, preprocessed_data):
-    weight_values = preprocessed_data[-6:-4]
+  def generate_weight(self, lst):
+    weight_values = lst[-6:-4]
 
     weight_list = []
-    integer_value = 0
+    weight = -1
     for data_element in weight_values:
       value = int(data_element[0].upper(), 16) * 16 + int(data_element[1].upper(), 16)
       weight_list.append(value)
-    integer_value = weight_list[0] / self.weight_coefficient
-    # print(weight_values)
-    return integer_value
+    weight = (weight_list[0] + weight_list[1]) / 7.2
+    return weight
 
   def generate_image(self, input_path, output_path):
     splitted_data, id = self.split_data(input_path)
