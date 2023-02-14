@@ -78,7 +78,7 @@ class Foot:
     return data
 
   def generate_weight(self, preprocessed_data):
-    weight_values = preprocessed_data[1154:1156]
+    weight_values = preprocessed_data[-6:-4]
 
     weight_list = []
     integer_value = 0
