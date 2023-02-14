@@ -34,7 +34,7 @@ class Foot:
     data = data.upper()
     data = data.replace(u'\xa0', u'')
     splitted_data = [''.join(x) for x in zip(*[list(data[z::2]) for z in range(2)])]
-    return splitted_data
+    return splitted_data, json_data['id']
 
   def data_preprocessing(self, data):
     preprocessed = []
@@ -90,7 +90,7 @@ class Foot:
     return integer_value
 
   def generate_image(self, input_path, output_path):
-    splitted_data = self.split_data(input_path)
+    splitted_data, id = self.split_data(input_path)
     weight_values =  self.generate_weight(splitted_data)
     lst = (self.data_preprocessing(splitted_data[20:]))
     # lst = self.remove_blank(lst)
@@ -112,19 +112,19 @@ class Foot:
     # resized_sample = cv2.resize(sample, (512, 512), interpolation=cv2.INTER_CUBIC)
     # dst = cv2.applyColorMap(resized_sample, 16)
 
-    final_output_path = output_path + 'foot_image.jpg'
+    final_output_path = output_path + 'foot_image_{}.jpg'.format(str(id))
     # print('create : ', final_output_path)
     image_data = cv2.imwrite(final_output_path, dst)
     return dst, weight_values
 
 class S3:
-  def ImageUploadToS3(self):
+  def ImageUploadToS3(self, id):
     s3_obj=self.s3_connection()
 
     new_name=str(uuid.uuid4())+'.jpg'
     print(new_name)
 
-    self.s3_put_object(s3_obj,new_name)
+    self.s3_put_object(s3_obj,new_name, id)
 
     image_url=self.s3_get_image_url(new_name)
     return image_url
@@ -144,8 +144,8 @@ class S3:
           print("s3 bucket connected!")
           return s3_obj
        
-  def s3_put_object(self,s3_obj,new_name):
-      s3_obj.upload_file('./foot_image.jpg',BUCKET_NAME,new_name,ExtraArgs={'ContentType':'image/jpg'})
+  def s3_put_object(self,s3_obj,new_name, id):
+      s3_obj.upload_file('./foot_image_{}.jpg'.format(id),BUCKET_NAME,new_name,ExtraArgs={'ContentType':'image/jpg'})
       return True
 
   def s3_get_image_url(self,filename):
@@ -181,7 +181,7 @@ def classification():
   _, weight_values = foot.generate_image(params, './')
 
   s3 = S3()
-  image_url=s3.ImageUploadToS3()
+  image_url=s3.ImageUploadToS3(id)
 
   sql = Sql()
   weight = weight_values # random.randrange(40, 100)
