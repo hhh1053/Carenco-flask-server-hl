@@ -33,7 +33,7 @@ jobs:
           python-version: '3.7'
 
       - name: decrypt file
-        run: gpg --quiet --batch --yes --decrypt --passphrase="$PASS_PHRASE" --output $HOME/key.py.gpg
+        run: gpg --quiet --batch --yes --decrypt --passphrase="$PASS_PHRASE" --output $HOME/key.py key.py.gpg
         env:
           PASS_PHRASE: ${{ secrets.PASS_PHRASE }}
 

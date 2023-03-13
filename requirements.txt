@@ -1,5 +1,7 @@
-numpy==1.19.5
-opencv-contrib-python==4.1.0.25
-opencv-python==4.1.0.25
-requests_toolbelt
-flask
+boto3==1.26.52
+Flask==2.2.2
+requests-toolbelt==0.10.1
+numpy==1.17
+opencv-python==4.7.0.68
+opencv-contrib-python==4.7.0.68
+PyMySQL==1.0.2
