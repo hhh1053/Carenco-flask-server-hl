@@ -188,7 +188,6 @@ def classification():
 
 
   return image_url
-  #return jsonify({'url' : image_url, 'weight' : weight})
 
 @app.route("/health",methods=['GET'])
 def health():
