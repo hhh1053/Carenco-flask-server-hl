@@ -186,13 +186,17 @@ def classification():
   weight = weight_values # random.randrange(40, 100)
   sql.save(id,image_url,weight)
 
- 
 
   return image_url
+  #return jsonify({'url' : image_url, 'weight' : weight})
 
 @app.route("/health",methods=['GET'])
 def health():
   return ""
-  
+
+@app.route("/check",methods=['GET'])
+def check():
+  return "check"
+
 if __name__ == "__main__":
   app.run(host='0.0.0.0', port=5000)
