@@ -8,12 +8,7 @@ import pymysql
 from flask import Flask, Response, request, send_file, jsonify, render_template
 from requests_toolbelt import MultipartEncoder
 import random
-
-REGION='ap-northeast-2'
-ACCESS_KEY_ID='AKIAQTAIP2INMKL7LST6'
-ACCESS_SECRET_KEY='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'
-BUCKET_NAME='carenco-image-server2'
-LOCATION ='ap-northeast-2'
+from key import *
 
 
 
@@ -154,7 +149,7 @@ class S3:
 class Sql():
 
   def save(self,id,img_url,weight):
-    conn = pymysql.connect(host='database-1.c5pmtrhecz2d.ap-northeast-1.rds.amazonaws.com', user='admin', db='carenco', password='zpdjdpszh', charset='utf8') 
+    conn = pymysql.connect(host=DB_HOST, user=DB_USER, db=DB_NAME, password=DB_KEY, charset='utf8') 
     cursor = conn.cursor() 
     sql = "UPDATE carenco.foot_print SET image = %s,weight = %s WHERE id = %s" 
     cursor.execute(sql,(img_url,weight,id)) 
