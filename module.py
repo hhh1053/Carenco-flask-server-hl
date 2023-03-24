@@ -1,6 +1,12 @@
 import json
 import numpy as np
 import cv2
+import io
+import os
+# 구글 클라우드 패키지 설치( pip install google-cloud-vision )
+from google.cloud import vision
+# 구글 api 사용을 위한 key
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'googleKey/carenco-94e1e-b23d0f406034.json'
 
 class Foot:
   def __init__(self):
@@ -101,6 +107,47 @@ class Foot:
     # print('create : ', final_output_path)
     image_data = cv2.imwrite(final_output_path, dst)
     return dst, weight_values
+
+  def generate_ocrdata_googleVision(image_path):
+    client = vision.ImageAnnotatorClient()
+
+    with io.open(image_path, 'rb') as image_file:
+      content = image_file.read()
+
+    image = vision.Image(content=content)
+    response = client.text_detection(image=image)
+    # 전체 데이터 들어간 문자열
+    texts = response.text_annotations
+
+    # 이미지 양식이 정해지면 위치값 수정해야합니다.
+    # 몸무게 데이터
+    weight = text_extraction(response, 249, 63, 276, 74)
+    # 근골격량 데이터
+    skeletal_muscle_mas = text_extraction(response, 192, 94, 217, 106)
+    # 체지방량 데이터
+    body_fat_mass = text_extraction(response, 292, 127, 318, 137)
+    # json 데이터
+    output = {
+      "weight": weight,
+      "skeletal_muscle_mas": skeletal_muscle_mas,
+      "body_fat_mass": body_fat_mass
+    }
+
+    # 측정된 값 출력 테스트
+    # print('- Output -----------------')
+    # print(json.dumps(output))
+
+    return output
+
+
+def text_extraction(response, x1, y1, x2, y2):
+  for item in response.text_annotations:
+    vertices = item.bounding_poly.vertices
+    if vertices[0].x == x1 and vertices[0].y == y1 and \
+            vertices[2].x == x2 and vertices[2].y == y2:
+      return item.description
+
+  return "Not Found description"
 
 
 if __name__ == '__main__':
