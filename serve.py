@@ -12,8 +12,12 @@ import io
 import os
 from google.cloud import vision
 
+# 현재 작성된 코드 파일이 있는 디렉토리
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 # 구글 api 사용을 위한 key
-os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'googleKey/carenco-94e1e-b23d0f406034.json'
+google_path = os.path.join(BASE_DIR, 'googleKey/carenco-94e1e-b23d0f406034.json')
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = google_path
 
 REGION = 'ap-northeast-2'
 ACCESS_KEY_ID = 'AKIAQTAIP2INMKL7LST6'
@@ -268,7 +272,15 @@ def check():
 @app.route('/test', methods=['GET'])
 def test():
     foot = Foot()
-    data = foot.generate_ocrdata_googleVision('Resources/testImage.png')
+    # 이미지 파일이 있는 디렉토리
+    IMAGE_DIR = os.path.join(BASE_DIR, 'resources')
+
+    # 이미지 파일 경로
+    image_path = os.path.join(IMAGE_DIR, 'testImage.png')
+
+    # 이미지 파일 사용
+    data = foot.generate_ocrdata_googleVision(image_path)
+    # data = foot.generate_ocrdata_googleVision('resources/testImage.png')
 
     sql = Sql()
     sql.create_health_info(data)
@@ -276,4 +288,4 @@ def test():
 
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=9000)
