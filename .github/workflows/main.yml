@@ -33,7 +33,7 @@ jobs:
           python-version: '3.7'
 
       - name: decrypt file
-        run: gpg --quiet --batch --yes --decrypt --passphrase="$PASS_PHRASE" --output $HOME/key.py key.py.gpg
+        run: gpg --quiet --batch --yes --decrypt --passphrase="$PASS_PHRASE" --output key.py key.py.gpg
         env:
           PASS_PHRASE: ${{ secrets.PASS_PHRASE }}
 
@@ -58,10 +58,6 @@ jobs:
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
-          
-#       - name: Delete key
-#         id: delete-key
-#         run: rm -f $HOME/key.py
 
       - name: Fill in the new image ID in the Amazon ECS task definition
         id: task-def
