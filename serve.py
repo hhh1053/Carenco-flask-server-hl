@@ -151,7 +151,7 @@ class Sql():
   def save(self,id,img_url,weight):
     conn = pymysql.connect(host=DB_HOST, user=DB_USER, db=DB_NAME, password=DB_KEY, charset='utf8') 
     cursor = conn.cursor() 
-    sql = "UPDATE carenco.foot_print SET image = %s,weight = %s WHERE id = %s" 
+    sql = "UPDATE carenco.foot_print_image SET image = %s,weight = %s WHERE id = %s" 
     cursor.execute(sql,(img_url,weight,id)) 
     conn.commit()
 
@@ -182,7 +182,8 @@ def classification():
   sql.save(id,image_url,weight)
 
 
-  return image_url
+  #return image_url
+  return jsonify({'url' : image_url, 'weight' : weight})
 
 @app.route("/health",methods=['GET'])
 def health():
