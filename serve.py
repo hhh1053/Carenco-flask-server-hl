@@ -138,11 +138,11 @@ class Foot:
 
         # 이미지 양식이 정해지면 위치값 수정해야합니다.
         # 몸무게 데이터
-        weight = text_extraction(response, 249, 63, 276, 74)
+        weight = text_extraction(response, 107, 51, 460, 80)
         # 근골격량 데이터
-        skeletal_muscle_mas = text_extraction(response, 192, 94, 217, 106)
+        skeletal_muscle_mas = text_extraction(response, 107, 82, 460, 110)
         # 체지방량 데이터
-        body_fat_mass = text_extraction(response, 292, 127, 318, 137)
+        body_fat_mass = text_extraction(response, 107, 114, 460, 140)
         # json 데이터
         output = {
             "weight": weight,
@@ -151,19 +151,26 @@ class Foot:
         }
 
         # 측정된 값 출력 테스트
-        print('- Output -----------------')
-        print(json.dumps(output))
+        # print('- Output -----------------')
+        # print(json.dumps(output))
 
         return output
 
 
 def text_extraction(response, x1, y1, x2, y2):
-    for item in response.text_annotations:
-        vertices = item.bounding_poly.vertices
-        if vertices[0].x == x1 and vertices[0].y == y1 and \
-                vertices[2].x == x2 and vertices[2].y == y2:
-            return item.description
-
+    value_found = False
+    for annotation in response.text_annotations:
+        vertices = annotation.bounding_poly.vertices
+        if vertices[0].x >= x1 and vertices[0].y >= y1 and \
+           vertices[2].x <= x2 and vertices[2].y <= y2:
+            value = annotation.description.replace('\n', '')
+            if not value_found:
+                if re.match(r'^\d*\.\d+$', value):
+                    value_found = True
+                    return value
+            else:
+                if re.match(r'^\d*\.\d+$', value):
+                    return value
     return "Not Found description"
 
 
