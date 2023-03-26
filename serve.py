@@ -10,6 +10,7 @@ from requests_toolbelt import MultipartEncoder
 import random
 import io
 import os
+import re
 from google.cloud import vision
 
 # 현재 작성된 코드 파일이 있는 디렉토리
