@@ -6,12 +6,17 @@ import uuid
 import boto3
 import pymysql
 from flask import Flask, Response, request, send_file, jsonify, render_template
+from flask_restx import Api, Resource  # Api 구현을 위한 Api 객체 import
 from requests_toolbelt import MultipartEncoder
 import random
 import io
 import os
 import re
 from google.cloud import vision
+
+#  TODO: 이름 및 주석 변경
+app = Flask(__name__)  # Flask 객체 선언, 파라미터로 어플리케이션 패키지의 이름을 넣어줌.
+api = Api(app)  # Flask 객체에 Api 객체 등록
 
 # 현재 작성된 코드 파일이 있는 디렉토리
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -296,4 +301,4 @@ def test():
 
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=9000)
+    app.run(host='0.0.0.0', port=19000)
