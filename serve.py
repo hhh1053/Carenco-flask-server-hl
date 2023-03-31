@@ -299,6 +299,6 @@ def test():
     sql.create_health_info(data)
     return "test"
 
-
+# 기본 값 9000
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=19000)
