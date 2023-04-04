@@ -50,4 +50,4 @@ jobs:
       run: docker pull songjuh/carenco-flask:latest
 
     - name: Run Docker Container
-      run: docker run songjuh/carenco-flask:latest python3 serve.py
+      run: docker run songjuh/carenco-flask:latest python3 route.py

@@ -1,32 +1,24 @@
 import json
-import numpy as np
+
 import cv2
-import io
-import os
-import re
-# 구글 클라우드 패키지 설치( pip install google-cloud-vision )
-from google.cloud import vision
-
-# 현재 작성된 코드 파일이 있는 디렉토리
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-
-# 구글 api 사용을 위한 key
-google_path = os.path.join(BASE_DIR, 'googleKey/carenco-94e1e-b23d0f406034.json')
-os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = google_path
+import numpy as np
 
 
 class Foot:
+    # '__init__(self)' 메서드: Foot 클래스의 생성자로, data, image_data, weight_coefficient 속성을 초기화합니다.
     def __init__(self):
         self.data = None
         self.image_data = None
         self.weight_coefficient = 3.7
 
+    # 'load_json(self, data)' 메서드: JSON 파일을 읽어와서 data 속성에 저장합니다.
     def load_json(self, data):
         with open(data, 'r') as j:
             json_data = json.loads(j.read())
         self.data = json_data  # json_data['data']
         return self.data
 
+    # 'split_data(self, json_data)' 메서드: data 속성에서 발바닥 이미지 데이터를 추출하여, 문자열로 된 16진수 값을 파싱하고, 이를 두 자리씩 묶어서 배열 형태로 반환합니다.
     def split_data(self, json_data):
         data = json_data['data']
         data = data.upper()
@@ -34,6 +26,7 @@ class Foot:
         splitted_data = [''.join(x) for x in zip(*[list(data[z::2]) for z in range(2)])]
         return splitted_data
 
+    # 'data_preprocessing(self, data)' 메서드: 두 자리씩 묶인 16진수 값을 10진수 값으로 변환하여, 24x48 형태의 2차원 배열로 변환합니다.
     def data_preprocessing(self, data):
         preprocessed = []
         sub_data = []
@@ -45,6 +38,7 @@ class Foot:
                 sub_data = []
         return np.array(preprocessed)
 
+    # 'merged_data(self, data)' 메서드: data 배열을 24x24 형태의 2차원 배열로 변환합니다.
     def merged_data(self, data):
         data_transformed = np.zeros((24, 24))
         for row_idx in range(24):
@@ -53,6 +47,7 @@ class Foot:
 
         return data_transformed
 
+    # 'remove_blank(self, data)' 메서드: data 배열에서 빈 공간을 제거하여, 24xN 형태의 2차원 배열로 변환합니다.
     def remove_blank(self, data):
         data = np.array(data)
         data = np.delete(data, 0, 1)
@@ -75,6 +70,7 @@ class Foot:
             col_idx += 1
         return data
 
+    # 'generate_weight(self, preprocessed_data)' 메서드: preprocessed_data 배열에서 발바닥 무게 데이터를 추출하여, 무게 값을 계산합니다.
     def generate_weight(self, preprocessed_data):
         weight_values = preprocessed_data[1154:1156]
 
@@ -87,6 +83,7 @@ class Foot:
         # print(weight_values)
         return integer_value
 
+    # 'generate_image(self, input_path, output_path)' 메서드: 입력 파일(input_path)에서 발바닥 이미지를 추출하고, 해당 이미지를 가공하여 출력 파일(output_path)에 저장합니다.
     def generate_image(self, input_path, output_path):
         splitted_data = self.split_data(input_path)
         weight_values = self.generate_weight(splitted_data)
@@ -121,52 +118,3 @@ if __name__ == '__main__':
     test_data = foot.load_json('./sample_data.json')
     # print(test_data)
     foot.generate_image(test_data, './')
-
-
-def generate_ocrdata_googleVision(image_path):
-    client = vision.ImageAnnotatorClient()
-
-    with io.open(image_path, 'rb') as image_file:
-        content = image_file.read()
-
-    image = vision.Image(content=content)
-    response = client.text_detection(image=image)
-    # 전체 데이터 들어간 문자열
-    texts = response.text_annotations
-
-    # 이미지 양식이 정해지면 위치값 수정해야합니다.
-    # 몸무게 데이터
-    weight = text_extraction(response, 107, 51, 460, 80)
-    # 근골격량 데이터
-    skeletal_muscle_mas = text_extraction(response, 107, 82, 460, 110)
-    # 체지방량 데이터
-    body_fat_mass = text_extraction(response, 107, 114, 460, 140)
-    # json 데이터
-    output = {
-        "weight": weight,
-        "skeletal_muscle_mas": skeletal_muscle_mas,
-        "body_fat_mass": body_fat_mass
-    }
-
-    # 측정된 값 출력 테스트
-    # print('- Output -----------------')
-    # print(json.dumps(output))
-
-    return output
-
-
-def text_extraction(response, x1, y1, x2, y2):
-    value_found = False
-    for annotation in response.text_annotations:
-        vertices = annotation.bounding_poly.vertices
-        if vertices[0].x >= x1 and vertices[0].y >= y1 and \
-           vertices[2].x <= x2 and vertices[2].y <= y2:
-            value = annotation.description.replace('\n', '')
-            if not value_found:
-                if re.match(r'^\d*\.\d+$', value):
-                    value_found = True
-                    return value
-            else:
-                if re.match(r'^\d*\.\d+$', value):
-                    return value
-    return "Not Found description"
