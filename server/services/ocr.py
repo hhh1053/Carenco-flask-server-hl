@@ -8,18 +8,11 @@ import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 from PIL import ImageFont, ImageDraw, Image
-# 구글 클라우드 패키지 설치( pip install google-cloud-vision )
+# 구글 클라우드 패키지 설치( pip install google-cloud-vision(requirements.txt 에 추가예정) )
 from google.cloud import vision
 
-# 현재 작성된 코드 파일이 있는 디렉토리
-# BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-# BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-
 # 구글 api 사용을 위한 key
-# google_path = os.path.join(BASE_DIR, 'googleKey/carenco-94e1e-b23d0f406034.json')
-# os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = google_path
-google_path = 
-os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = google_path
+# os.environ['GOOGLE_APPLICATION_CREDENTIALS'] =
 
 
 class googleVision:

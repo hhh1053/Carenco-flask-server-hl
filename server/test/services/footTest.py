@@ -6,6 +6,7 @@ import numpy as np
 
 import server.services.foot as FootClass
 
+# 테스트용 JSON 파일
 current_directory = os.path.dirname(os.path.abspath(__file__))
 sample_data = os.path.join(current_directory, '..', '..', 'resources', 'json', 'sample_data.json')
 

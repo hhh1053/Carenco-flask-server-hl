@@ -2,6 +2,7 @@ import os
 import pytest
 import server.services.ocr as ocr
 
+# 테스트용 이미지
 current_directory = os.path.dirname(os.path.abspath(__file__))
 test_image_path = os.path.join(current_directory, '..', '..', 'resources', 'image', '8.png')
 

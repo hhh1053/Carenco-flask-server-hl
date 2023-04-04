@@ -57,7 +57,7 @@ class Ocr(Resource):
         try:
             foot = Foot()
 
-            # 이미지 파일 사용
+            # request로 넘어오는 이미지
             file = request.files['file']
             data = ocr.googleVision.google_ocr(file)
 
