@@ -18,8 +18,7 @@ from google.cloud import vision
 # 구글 api 사용을 위한 key
 # google_path = os.path.join(BASE_DIR, 'googleKey/carenco-94e1e-b23d0f406034.json')
 # os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = google_path
-current_directory = os.path.dirname(os.path.abspath(__file__))
-google_path = os.path.join(current_directory, '..', 'googleKey', 'carenco-94e1e-b23d0f406034.json')
+google_path = 
 os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = google_path
 
 
