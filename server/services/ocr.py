@@ -91,7 +91,7 @@ class googleVision:
 
     def calculate_body_type(self, bmi: Optional[float], body_fat_percentage: Optional[float]) -> Optional[str]:
             def invalid_measurement() -> str:
-                return "메서드 예외상황 발생."
+                return "잘못된 값이 측정되었습니다."
 
             def not_measured() -> str:
                 return "측정되지 않았습니다"
