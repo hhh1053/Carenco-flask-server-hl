@@ -26,11 +26,11 @@ class googleVision:
         return cv2.imdecode(np.frombuffer(content, np.uint8), cv2.IMREAD_UNCHANGED)
 
     def preprocess_image(self, image):
-        # img_resized = cv2.resize(image, (1200, 1600))
-        # img_gray = cv2.cvtColor(img_resized, cv2.COLOR_BGR2GRAY)
-        img_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        # Sharpen the image
+        kernel = np.array([[-1, -1, -1], [-1, 9, -1], [-1, -1, -1]])
+        img_sharpened = cv2.filter2D(image, -1, kernel)
 
-        return img_gray
+        return img_sharpened
 
     def get_vision_response(self, client, image):
         height, width = image.shape
