@@ -8,6 +8,8 @@ from database.sql import Sql
 from services.foot import Foot
 import services.ocr as ocr
 
+import random
+
 app = Flask(__name__)  # Flask 객체 선언, 파라미터로 어플리케이션 패키지의 이름을 넣어줌.
 api = Api(app, version='1.0', title='Carenco Flask Server',
           description='Carenco Flask Server 입니다. 각 Api들을 테스트할 수 있습니다.')  # Flask 객체에 Api 객체 등록
@@ -15,23 +17,30 @@ api = Api(app, version='1.0', title='Carenco Flask Server',
 
 @api.route('/image')
 class Image(Resource):
-    def put(self):
+    def post(self):
         '''ID 값을 이용하여 이미지를 가공하여 저장하는 Api'''
         try:
             params = request.get_json(force=True)
             id = params['id']
+            print("id값 {}".format(id))
 
             foot = Foot()
             _, weight_values = foot.generate_image(params, './')
+            standard_num = random.randint(1, 8) ##임시 1-8 사이의 번호 생성
 
             s3 = S3()
             image_url = s3.ImageUploadToS3(id)
 
             sql = Sql()
             weight = weight_values  # random.randrange(40, 100)
-            sql.save(id, image_url, weight)
+            sql.save(id,image_url,weight,standard_num)
+            description = sql.find_description(standard_num)
 
-            return image_url
+            print(description[0])
+
+            #return image_url
+            return jsonify({'url' : image_url, 'weight' : weight, 'description' : description})
+
         except KeyError:
             return {"error": "invalid request parameters"}, 400
 
