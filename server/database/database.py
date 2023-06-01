@@ -36,7 +36,7 @@ class S3:
             return s3_obj
 
     def s3_put_object(self, s3_obj, new_name, id):
-        s3_obj.upload_file('./foot_image_{}.jpg'.format(id), BUCKET_NAME, new_name,
+        s3_obj.upload_file('./foot_image.jpg'.format(id), BUCKET_NAME, new_name,
                            ExtraArgs={'ContentType': 'image/jpg'})
         return True
 
