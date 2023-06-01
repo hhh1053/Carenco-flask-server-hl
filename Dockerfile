@@ -9,4 +9,4 @@ RUN pip3 install tensorflow --no-cache-dir
 RUN apt-get update
 RUN apt-get -y install libgl1-mesa-glx
 
-CMD ["python3", "/app/serve.py"]
+CMD ["python3", "/app/server/route.py"]
