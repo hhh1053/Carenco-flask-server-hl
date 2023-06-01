@@ -1,5 +1,5 @@
 ### Carenco-flask-server-hl API
-FootPrint이미지 추출과 인바디 결좌지 OCR을 위한 RESTful API입니다.
+FootPrint이미지 추출과 인바디 결과지 OCR을 위한 RESTful API입니다.
 
 Swagger-UI가 적용되어 있습니다.
 
