@@ -39,7 +39,7 @@ class Image(Resource):
             print(description[0])
 
             #return image_url
-            return jsonify({'url' : image_url, 'weight' : weight, 'description' : description})
+            return jsonify({'id' : id ,'url' : image_url, 'weight' : weight, 'description' : description})
 
         except KeyError:
             return {"error": "invalid request parameters"}, 400
