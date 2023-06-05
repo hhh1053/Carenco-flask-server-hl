@@ -50,15 +50,21 @@ jobs:
 
       - name: Build, tag, and push image to Amazon ECR
         id: build-image
+        uses: docker/build-push-action@v2
+        if: contains(github.ref, 'main')
         env:
-            ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-            ECR_REPOSITORY: carenco-flask
-            IMAGE_TAG: ${{ github.sha }}
-        run: |
-            docker build --cache-from $ECR_REGISTRY/$ECR_REPOSITORY:latest -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-            docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-            echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
-
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          TAG: ${{ github.sha }}
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{env.ECR}}/carenco-flask:main
+            ${{env.ECR}}/carenco-flask:main-${{env.TAG}}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            ENV=main
 
       - name: Fill in the new image ID in the Amazon ECS task definition
         id: task-def
@@ -75,5 +81,3 @@ jobs:
           service: ecs-service-flask
           cluster: ecs-cluster-flask
           wait-for-service-stability: true
-
-    
