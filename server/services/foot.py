@@ -3,12 +3,17 @@ import json
 import cv2
 import numpy as np
 
+from services.FootClassifier import Classifier
+
 
 class Foot:
     # '__init__(self)' 메서드: Foot 클래스의 생성자로, data, image_data, weight_coefficient 속성을 초기화합니다.
     def __init__(self):
         self.data = None
         self.image_data = None
+        self.model = Classifier()
+        # Create an instance of the model
+        self.model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
         self.weight_coefficient = 3.7
 
     # 'load_json(self, data)' 메서드: JSON 파일을 읽어와서 data 속성에 저장합니다.
@@ -33,16 +38,16 @@ class Foot:
         for data_element in data:
             value = int(data_element[0].upper(), 16) * 16 + int(data_element[1].upper(), 16)
             sub_data.append(value)
-            if len(sub_data) == 48:
+            if len(sub_data) == 22:
                 preprocessed.append(sub_data)
                 sub_data = []
         return np.array(preprocessed)
 
     # 'merged_data(self, data)' 메서드: data 배열을 24x24 형태의 2차원 배열로 변환합니다.
     def merged_data(self, data):
-        data_transformed = np.zeros((24, 24))
-        for row_idx in range(24):
-            for col_idx in range(0, 48, 2):
+        data_transformed = np.zeros((29,22))
+        for row_idx in range(29):
+            for col_idx in range(0, 22, 2):
                 data_transformed[row_idx][col_idx // 2] = data[row_idx][col_idx] + data[row_idx][col_idx + 1]
 
         return data_transformed
@@ -84,17 +89,19 @@ class Foot:
         return integer_value
 
     # 'generate_image(self, input_path, output_path)' 메서드: 입력 파일(input_path)에서 발바닥 이미지를 추출하고, 해당 이미지를 가공하여 출력 파일(output_path)에 저장합니다.
-    def generate_image(self, input_path, output_path):
-        splitted_data = self.split_data(input_path)
-        weight_values = self.generate_weight(splitted_data)
-        lst = (self.data_preprocessing(splitted_data[20:]))
-        # lst = self.remove_blank(lst)
-        lst = self.merged_data(lst)
-        image_data = np.array(lst)
-        sample = image_data.astype(np.uint8)
-
+    def generate_image(self, input_data, output_path):
+        # splitted_data = self.split_data(input_path)
+        # weight_values = self.generate_weight(splitted_data)
+        # lst = (self.data_preprocessing(splitted_data[20:]))
+        # # lst = self.remove_blank(lst)
+        # lst = self.merged_data(lst)
+        # image_data = np.array(lst)
+        # sample = image_data.astype(np.uint8)
+        json_data = self.split_data(input_data)
+        arry = self.data_preprocessing(json_data[:-7])
         # sample = np.interp(sample, (sample.min(), sample.max()), (0, 255))
-
+        image_data = np.array(arry)
+        sample = image_data.astype(np.uint8)
         # Normalize matrix values between 0 and 255
         heatmap = cv2.normalize(sample, None, 0, 256, cv2.NORM_MINMAX, dtype=cv2.CV_8U)
         # heatmap = cv2.GaussianBlur(heatmap, (15, 15), 0)
@@ -107,11 +114,23 @@ class Foot:
         # resized_sample = cv2.resize(sample, (512, 512), interpolation=cv2.INTER_CUBIC)
         # dst = cv2.applyColorMap(resized_sample, 16)
 
-        final_output_path = output_path + 'foot_image.jpg'
+        #final_output_path = output_path + 'foot_image.jpg'
         # print('create : ', final_output_path)
+        final_output_path = output_path + 'foot_image.jpg'
         image_data = cv2.imwrite(final_output_path, dst)
+        #return dst, weight_values
+        weight_values = 0
         return dst, weight_values
 
+    def classification(self, json_data):
+        data  = self.split_data(json_data)
+        arry = self.data_preprocessing(data[:-7])
+        image_data = np.array(arry)
+        ai_input_data = image_data.reshape((2, 29, 11, 1))
+        print("AI Input Data:", ai_input_data)
+        print("Model Output:", self.model(ai_input_data))
+        outputs = np.argmax(self.model(ai_input_data))
+        return outputs
 
 if __name__ == '__main__':
     foot = Foot()

@@ -26,7 +26,10 @@ class Image(Resource):
 
             foot = Foot()
             _, weight_values = foot.generate_image(params, './')
-            standard_num = random.randint(1, 8) ##임시 1-8 사이의 번호 생성
+            #standard_num = random.randint(1, 8) ##임시 1-8 사이의 번호 생성
+            standard_num = foot.classification(params)
+            print("정답 넘버 : {}".format(standard_num+1))
+            str_snum = str(standard_num + 1)
 
             s3 = S3()
             image_url = s3.ImageUploadToS3(id)
@@ -39,7 +42,7 @@ class Image(Resource):
             print(description[0])
 
             #return image_url
-            return jsonify({'id' : id ,'url' : image_url, 'weight' : weight, 'type' : standard_num , 'description' : description})
+            return jsonify({'id' : id ,'url' : image_url, 'weight' : weight, 'type' : str_snum , 'description' : description})
 
         except KeyError:
             return {"error": "invalid request parameters"}, 400
