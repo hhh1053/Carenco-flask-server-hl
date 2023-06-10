@@ -1,0 +1,7 @@
+foot.py
+127 reshape(1,29 -> (2,29
+128 model -> classifier
+
+FootClassifier.py
+16 x= tf.cast(x, tf.float32) 추가 
+

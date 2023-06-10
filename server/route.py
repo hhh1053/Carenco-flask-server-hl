@@ -26,10 +26,12 @@ class Image(Resource):
 
             foot = Foot()
             _, weight_values = foot.generate_image(params, './')
-            #standard_num = random.randint(1, 8) ##임시 1-8 사이의 번호 생성
-            standard_num = foot.classification(params)
-            print("정답 넘버 : {}".format(standard_num+1))
-            str_snum = str(standard_num + 1)
+            standard_num = random.randint(1, 7) ##임시 1-8 사이의 번호 생성
+
+            # #model 도입
+            # standard_num = foot.classification(params)
+            # print("정답 넘버 : {}".format(standard_num+1))
+            # str_snum = str(standard_num + 1)
 
             s3 = S3()
             image_url = s3.ImageUploadToS3(id)
