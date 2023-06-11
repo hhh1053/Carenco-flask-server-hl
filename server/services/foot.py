@@ -127,10 +127,12 @@ class Foot:
         arry = self.data_preprocessing(data[:-7])
         image_data = np.array(arry)
         ai_input_data = image_data.reshape((2, 29, 11, 1))
-        print("AI Input Data:", ai_input_data)
-        print("Model Output:", self.model(ai_input_data))
-        outputs = np.argmax(self.model(ai_input_data))
-        return outputs
+        # print("AI Input Data:", ai_input_data)
+        # print("Model Output:", self.model(ai_input_data))
+        output_probabilities = self.model(ai_input_data)
+        class_index = np.argmax(output_probabilities)
+        class_probability = output_probabilities[class_index]
+        return class_index, class_probability
 
 if __name__ == '__main__':
     foot = Foot()
