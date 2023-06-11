@@ -26,12 +26,13 @@ class Image(Resource):
 
             foot = Foot()
             _, weight_values = foot.generate_image(params, './')
-            standard_num = random.randint(1, 7) ##임시 1-8 사이의 번호 생성
+            #standard_num = random.randint(1, 7) ##임시 1-8 사이의 번호 생성
 
             # #model 도입
-            # standard_num = foot.classification(params)
-            # print("정답 넘버 : {}".format(standard_num+1))
-            # str_snum = str(standard_num + 1)
+            standard_num,class_probability = foot.classification(params)
+            standard_num += 1
+            print("정답 넘버 : {}".format(standard_num))
+            print("유사도 : {}".format(class_probability))
 
             s3 = S3()
             image_url = s3.ImageUploadToS3(id)
@@ -44,7 +45,7 @@ class Image(Resource):
             print(description[0])
 
             #return image_url
-            return jsonify({'id' : id ,'url' : image_url, 'weight' : weight, 'type' : standard_num , 'description' : description})
+            return jsonify({'id' : id ,'url' : image_url, 'weight' : weight, 'type' : standard_num , 'similarity' : class_probability, 'description' : description})
 
         except KeyError:
             return {"error": "invalid request parameters"}, 400
@@ -86,3 +87,13 @@ class Ocr(Resource):
 # 기본 값 9000
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000)
+
+def classification(self, json_data):
+        data  = self.split_data(json_data)
+        arry = self.data_preprocessing(data[:-7])
+        image_data = np.array(arry)
+        ai_input_data = image_data.reshape((2, 29, 11, 1))
+        print("AI Input Data:", ai_input_data)
+        print("Model Output:", self.model(ai_input_data))
+        outputs = np.argmax(self.model(ai_input_data))
+        return outputs

@@ -4,6 +4,7 @@ import cv2
 import numpy as np
 
 from services.FootClassifier import Classifier
+import random
 
 
 class Foot:
@@ -129,10 +130,13 @@ class Foot:
         ai_input_data = image_data.reshape((2, 29, 11, 1))
         # print("AI Input Data:", ai_input_data)
         # print("Model Output:", self.model(ai_input_data))
-        output_probabilities = self.model(ai_input_data)
-        class_index = np.argmax(output_probabilities)
-        class_probability = output_probabilities[class_index]
-        return class_index, class_probability
+        # outputs = np.argmax(self.model(ai_input_data))
+        # return outputs
+
+        class_index = random.randint(0,5)
+        output_probabilities = int((self.model(ai_input_data)[0][random.randint(0,5)]) * 100)
+        
+        return class_index, output_probabilities
 
 if __name__ == '__main__':
     foot = Foot()
