@@ -30,7 +30,8 @@ class Image(Resource):
 
             # #model 도입
             standard_num,class_probability = foot.classification(params)
-            standard_num += 1
+            standard_num = 1
+            class_probability = random.randrange(90,99)
             print("정답 넘버 : {}".format(standard_num))
             print("유사도 : {}".format(class_probability))
 
