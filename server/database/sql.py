@@ -1,13 +1,13 @@
 import pymysql
-
+from key import *
 
 class Sql():
 
     def __init__(self):
             self.conn = None
     def connect(self):
-            self.conn = pymysql.connect(host='database-1.c5pmtrhecz2d.ap-northeast-1.rds.amazonaws.com', user='admin',
-                               db='carenco', password='zpdjdpszh', charset='utf8')
+            self.conn = pymysql.connect(host=DB_HOST, user=DB_USER,
+                               db=DB_NAME, password=DB_KEY, charset='utf8')
 
     def save(self,id,img_url,weight,standard_num):
         self.connect()
@@ -40,9 +40,9 @@ class Sql():
     def create_health_info(self, data):
         print('- sql -----------------')
         print(data)
-        conn = pymysql.connect(host='database-1.c5pmtrhecz2d.ap-northeast-1.rds.amazonaws.com', user='admin',
-                               db='carenco',
-                               password='zpdjdpszh', charset='utf8')
+        conn = pymysql.connect(host=DB_HOST, user=DB_USER,
+                               db=DB_NAME,
+                               password=DB_KEY, charset='utf8')
         try:
             with conn.cursor() as cursor:
                 sql = "INSERT INTO foot_print_ocr (weight, muscle, fat) VALUES (%s, %s, %s)"

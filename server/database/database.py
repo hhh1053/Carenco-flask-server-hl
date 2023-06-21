@@ -1,12 +1,6 @@
 import uuid
-
+from key import *
 import boto3
-
-REGION = 'ap-northeast-2'
-ACCESS_KEY_ID = 'AKIAQTAIP2INMKL7LST6'
-ACCESS_SECRET_KEY = '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'
-BUCKET_NAME = 'carenco-image-server2'
-LOCATION = 'ap-northeast-2'
 
 class S3:
     def ImageUploadToS3(self, id):
