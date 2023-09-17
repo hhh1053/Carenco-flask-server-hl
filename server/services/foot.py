@@ -5,7 +5,7 @@ import numpy as np
 
 from services.FootClassifier import Classifier
 import random
-
+from rembg import remove
 
 class Foot:
     # '__init__(self)' 메서드: Foot 클래스의 생성자로, data, image_data, weight_coefficient 속성을 초기화합니다.
@@ -108,6 +108,8 @@ class Foot:
         # heatmap = cv2.GaussianBlur(heatmap, (15, 15), 0)
         heatmap = cv2.resize(heatmap, (512, 512))
 
+        heatmap = cv2.GaussianBlur(heatmap, (21, 21), 0)
+
         # Apply a colormap to the normalized matrix
         dst = cv2.applyColorMap(heatmap, cv2.COLORMAP_JET)
 
@@ -115,10 +117,32 @@ class Foot:
         # resized_sample = cv2.resize(sample, (512, 512), interpolation=cv2.INTER_CUBIC)
         # dst = cv2.applyColorMap(resized_sample, 16)
 
+
+
+
         #final_output_path = output_path + 'foot_image.jpg'
         # print('create : ', final_output_path)
+
         final_output_path = output_path + 'foot_image.jpg'
         image_data = cv2.imwrite(final_output_path, dst)
+
+       
+        color_img = np.ones((240,640),dtype=np.uint8)*255
+        color_img = cv2.resize(color_img, (512, 512))
+        final_output_path3 = output_path + 'color_img.jpg'
+        image_data = cv2.imwrite(final_output_path3, color_img)
+
+        dst = cv2.imread(final_output_path)
+        color_img = cv2.imread(final_output_path3)
+        
+
+        bgrLower = np.array([93, 0, 0])
+        bgrUpper = np.array([146, 8, 4])
+        mask = cv2.inRange(dst,bgrLower,bgrUpper)
+        cv2.copyTo(color_img, mask, dst)
+
+        final_output_path = output_path + 'foot_image.jpg'
+        image_data = cv2.imwrite(final_output_path,dst)
         #return dst, weight_values
         weight_values = 0
         return dst, weight_values
